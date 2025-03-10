@@ -1,9 +1,5 @@
 {
     "name": "liuzhongliang/mycaldav",
-    "authors": [{
-        "name": "liuzhongliang",
-        "email": "13439694341@qq.com"
-    }],
     "type": "project",
     "description": "使用laravel开发的一个简单CalDAV服务器项目.",
     "keywords": ["laravel", "caldav"],
@@ -15,13 +11,10 @@
         "ext-pdo": "*",
         "ext-dom": "*"
     },
-    "autoload": {
-        "psr-4": {
-            "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
-        }
-    },
+    "authors": [{
+        "name": "liuzhongliang",
+        "email": "13439694341@qq.com"
+    }],
     "minimum-stability": "stable",
     "prefer-stable": true
 }
