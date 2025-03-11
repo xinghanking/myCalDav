@@ -34,20 +34,9 @@ class Auth
             }
             session(['uid' => $info['id'], 'username' => $info['username'], 'email' => $info['email']]);
         }
-        $requestInfo = [
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'headers' => $request->headers->all(),
-            'body' => $request->getContent()
-        ];
-        Log::info('requestInfo', $requestInfo);
-        $response = $next($request);
-        $responseInfo = [
-            'status_code' => $response->getStatusCode(),
-            'headers' => $response->headers->all(),
-            'body' => $response->getContent()
-        ];
-        Log::info('responseInfo', $responseInfo);
-        return $response;
+        if(!in_array($request->getMethod(), ['PROPFIND', 'OPTIONS']) && !str_starts_with($request->getRequestUri(), '/' . session('username') . '/calendars/')) {
+            return response(null，  Response::HTTP_FORBIDDEN);
+        }
+        return $next($request);
     }
 }
