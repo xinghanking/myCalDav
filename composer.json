@@ -1,19 +1,22 @@
 {
     "name": "liuzhongliang/mycaldav",
-    "authors": [{
-        "name": "liuzhongliang",
-        "email": "13439694341@qq.com"
-    }],
     "type": "project",
     "description": "使用laravel开发的一个简单CalDAV服务器项目.",
     "keywords": ["laravel", "caldav"],
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^10.0",
-        "predis/predis": "^2.2",
-        "ext-pdo": "*",
-        "ext-dom": "*"
+        "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.10.1",
+        "predis/predis": "^2.2"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pail": "^1.2.2",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.41",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.6"
     },
     "autoload": {
         "psr-4": {
@@ -22,6 +25,10 @@
             "Database\\Seeders\\": "database/seeders/"
         }
     },
+    "authors": [{
+        "name": "liuzhongliang",
+        "email": "13439694341@qq.com"
+    }],
     "minimum-stability": "stable",
     "prefer-stable": true
 }
