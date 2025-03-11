@@ -34,8 +34,8 @@ class Auth
             }
             session(['uid' => $info['id'], 'username' => $info['username'], 'email' => $info['email']]);
         }
-        if(!in_array($request->getMethod(), ['PROPFIND', 'OPTIONS']) && !str_starts_with($request->getRequestUri(), '/' . session('username') . '/calendars/')) {
-            return response(null，  Response::HTTP_FORBIDDEN);
+        if(!in_array($request->getMethod(), ['OPTIONS', 'PROPFIND']) && !str_starts_with($request->getRequestUri(), '/' . session('username') . '/calendars/')) {
+            return response(''，  Response::HTTP_FORBIDDEN);
         }
         return $next($request);
     }

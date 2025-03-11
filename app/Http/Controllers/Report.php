@@ -29,11 +29,7 @@ class Report extends Controller
         if(str_ends_with($xml, '</sync-collection>')) {
             $reqType = 'sync-collection';
         } elseif(str_ends_with($xml, '</calendar-multiget>')) {
-            $reqType = 'calendar-multiget';/*
-        } elseif(str_ends_with($xml, '</calendar-query>')) {
-            $reqType = 'calendar-query';
-        } elseif (str_ends_with($xml, '</free-busy-query>')) {
-            $reqType = 'free-busy-query';*/
+            $reqType = 'calendar-multiget';
         } else {
             return response(null, Response::HTTP_NOT_FOUND);
         }
@@ -113,7 +109,7 @@ class Report extends Controller
                     foreach($data as $comp) {
                         $response = [['href', $comp['uri']]];
                         $comp['prop'] = json_decode($comp['prop'], true);
-                        $comp['prop']['c:calendar-data'] = $ics . $dbComp->getIcsByCompUid($comp['uid'], $comp['type']) . "\nEND:VCALENDAR\n]]>";
+                        $comp['prop']['c:calendar-data'] = $ics . $dbComp->getIcsByCompUid($info['id'], $comp['uid'], $comp['type']) . "\nEND:VCALENDAR\n]]>";
                         $prop = array_intersect_key($comp['prop'], $findProp);
                         $response[] = ['propstat', [['prop', $this->formatProps($prop)], ['status', 'HTTP/1.1 200 OK']]];
                         $missProp = array_diff_key($findProp, $comp['prop']);

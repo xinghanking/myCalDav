@@ -20,7 +20,7 @@ class Calendar extends Db
     const VERSION = '2.0';
     const CALSCALE = 'GREGORIAN';
 
-    const BASE_PROP = [
+    private $baseProp = [
         'd:resourcetype'            => '<d:collection /><c:calendar />',
         'c:supported-calendar-component-set' => '<c:comp name="VEVENT" /><c:comp name="VTODO" /><c:comp name="VJOURNAL" /><c:comp name="VFREEBUSY" />',
         'd:supported-report-set'    => '<d:report><d:sync-collection /></d:report><d:report><c:calendar-multiget /></d:report><d:report><c:calendar-query /></d:report><d:report><c:free-busy-query /></d:report>',
@@ -39,7 +39,7 @@ class Calendar extends Db
             ['privilege>', '<d:write-acl />'],
             ['privilege>', '<d:share />']
         ],
-        'c:calendar-timezone' => 'Asia/Shanghai',
+        'c:calendar-timezone'    => 'Asia/Shanghai',
         'd:creationdate'         => '',
         'd:getlastmodified'      => '',
         'd:getetag'              => '',
@@ -65,7 +65,7 @@ class Calendar extends Db
         $prop['d:getetag'] = md5(uniqid(mt_rand(), true));
         $prop['c:getctag'] = $prop['d:getetag'];
         $prop['d:sync_token'] = 1;
-        $prop = array_merge(self::BASE_PROP, $prop);
+        $prop = array_merge($this->baseProp, $prop);
         if(!empty($prop['c:supported-calendar-component-set'])) {
             if(is_array($prop['c:supported-calendar-component-set'])) {
                 $components = [];

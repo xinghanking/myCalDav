@@ -20,12 +20,11 @@ class Put extends Controller
             return response(null,400);
         }
         $uri = $request->getRequestUri();
-        if (empty($request->header('content-type')) || strtok($request->header('content-type'), ';') != 'text/calendar' || !in_array(substr($uri, -4), ['.ics', '.ifb'])
-        ) {
+        if (empty($request->header('content-type')) || strtok($request->header('content-type'), ';') != 'text/calendar' || !in_array(substr($uri, -4), ['.ics', '.ifb'])) {
             return response('<?xml version="1.0" encoding="UTF-8"?>
 <d:error xmlns:d="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav"><d:supported-media-type><d:mediatype>text/calendar</d:mediatype></d:supported-media-type><cal:supported-calendar-data><cal:calendar-data content-type="text/calendar" version="2.0"/></cal:supported-calendar-data></d:error>', 415);
         }
-        $ics = Db::icsToArr($request->getContent());
+        $ics = Db::icsToArr(trim($request->getContent()));
         if (empty($ics)) {
             return response(null,400);
         }
@@ -50,11 +49,13 @@ class Put extends Controller
         $recurrenceIds = [];
         foreach ($ics as $item) {
             if ($compUid != '' && $compUid != $item['UID']) {
+                file_put_contents('/home/web/app/laravel/log', 3);
                 return response(null,400);
             }
             $compUid = $item['UID'];
             $item['RECURRENCE-ID'] = $dbCalComp->formatCurrenceId($item['RECURRENCE-ID'] ?? '');
             if (in_array($item['RECURRENCE-ID'], $recurrenceIds)) {
+                file_put_contents('/home/web/app/laravel/log', 4);
                 return response(null,400);
             }
             $recurrenceIds[] = $item['RECURRENCE-ID'];

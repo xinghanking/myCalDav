@@ -15,7 +15,7 @@ class PropPatch extends Controller
     public function index(Request $request, $username)
     {
         if($username != session('username')) {
-            response(null,Response::HTTP_FORBIDDEN);
+            return response(null,Response::HTTP_FORBIDDEN);
         }
         $uri = $request->getRequestUri();
         $this->request = $request;

@@ -25,9 +25,9 @@ class Comp extends Db
         return $this->getRow($this->fields, ['uri' => $uri, 'recurrence_id' => '']);
     }
 
-    public function getIcsByCompUid($uid, $type) {
+    public function getIcsByCompUid($calendarId, $uid, $type) {
         $compType = array_search($type, self::TYPE_MAP);
-        $data = $this->getData('ics_data', ['uid' => $uid]);
+        $data = $this->getData('ics_data', ['calendar_id' => $calendarId, 'uid' => $uid]);
         foreach ($data as $k => $v) {
             $data[$k] = 'BEGIN:' . $compType . "\n" . $v['ics_data'] . "\nEND:" . $compType;
         }

@@ -11,7 +11,7 @@ class Mkcalendar extends Controller
 {
     public function index(Request $request, String $username){
         if($username != session('username')) {
-            abort(403);
+            return response('', Rsponse::HTTP_FORBIDDEN);
         }
         $uri = $request->getRequestUri();
         $dbCalendar = Calendar::getInstance();
@@ -23,12 +23,18 @@ class Mkcalendar extends Controller
         $prop = $this->getSetProp();
         $dbCalendar = Calendar::getInstance();
         $dbCalendar->addCalendar(['uri' => $uri], $prop);
-        return response(null, 201);
+        return response('', 201);
     }
 
     public function getSetProp() {
         $xml = $this->request->getContent();
         $ns = $this->getNameSpaceFromXml($xml);
+        $replace = [];
+        foreach ($ns as $prefix => $uri) {
+            $replace['<'.$prefix.':']  = '<'.PropNS::getPrefixByUri($uri).':';
+            $replace['</'.$prefix.':'] = '</'.PropNS::getPrefixByUri($uri).':';
+        }
+        $xml = str_replace(array_keys($replace), array_values($replace), $xml);
         $dPrefix = array_search('DAV:', $ns);
         $cPrefix = array_search('urn:ietf:params:xml:ns:caldav', $ns);
         $xml = str_replace([$dPrefix . ':prop', $cPrefix . ':comp'], ['prop', 'c:comp'], $xml);
