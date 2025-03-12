@@ -25,6 +25,7 @@ class Calendar extends Db
         'c:supported-calendar-component-set' => '<c:comp name="VEVENT" /><c:comp name="VTODO" /><c:comp name="VJOURNAL" /><c:comp name="VFREEBUSY" />',
         'd:supported-report-set'    => '<d:report><d:sync-collection /></d:report><d:report><c:calendar-multiget /></d:report><d:report><c:calendar-query /></d:report><d:report><c:free-busy-query /></d:report>',
         'd:displayname'             => '',
+        'c:calendar-description'    => '',
         'd:supported-privilege-set' => [
             ['privilege>', '<c:read-free-busy />'],
             ['privilege>', '<d:read />'],
@@ -64,7 +65,8 @@ class Calendar extends Db
         $prop['d:getlastmodified'] = gmdate('D, d M Y H:i:s', time()) . ' GMT';
         $prop['d:getetag'] = md5(uniqid(mt_rand(), true));
         $prop['c:getctag'] = $prop['d:getetag'];
-        $prop['d:sync_token'] = 1;
+        $prop['d:sync-token'] = 1;
+        unset($prop['d:resourcetype']);
         $prop = array_merge($this->baseProp, $prop);
         if(!empty($prop['c:supported-calendar-component-set'])) {
             if(is_array($prop['c:supported-calendar-component-set'])) {
@@ -130,7 +132,7 @@ class Calendar extends Db
     {
         $prop['d:getlastmodified'] = gmdate('Y-m-d\TH:i:s\Z', time());
         $prop['d:getetag'] = $this->createEtag();
-        $prop['d:sync_token'] = $this->createSyncToken();
+        $prop['d:sync-token'] = $this->createSyncToken();
         $prop['d:getctag'] = $prop['d:getetag'];
         return static::query()->where('id', '=', $id)->update(['prop' => json_encode($prop, JSON_UNESCAPED_UNICODE)]);
     }
