@@ -5,25 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Base\Controller;
 use App\Models\Db\Calendar;
 use App\Models\Db\PropNS;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class Mkcalendar extends Controller
 {
     public function index(Request $request, String $username){
         if($username != session('username')) {
-            return response('', Rsponse::HTTP_FORBIDDEN);
+            return response('', Response::HTTP_FORBIDDEN);
         }
         $uri = $request->getRequestUri();
         $dbCalendar = Calendar::getInstance();
         $info = $dbCalendar->getBaseInfoByUri($uri);
         if(!empty($info)){
-            abort(409);
+            return response('', Response::HTTP_BAD_REQUEST);
         }
         $this->request = $request;
         $prop = $this->getSetProp();
         $dbCalendar = Calendar::getInstance();
         $dbCalendar->addCalendar(['uri' => $uri], $prop);
-        return response('', 201);
+        return response('', Response::HTTP_CREATED);
     }
 
     public function getSetProp() {
@@ -43,7 +43,7 @@ class Mkcalendar extends Controller
             preg_match_all('/<([^>\/\s]+)(\s[^>\/\s]+\s*)*>(.*?)<\/\1>/is', $propMatches[1], $matches);
             for ($i = 0; $i < count($matches[1]); $i++) {
                 $tagName = $matches[1][$i];
-                if(strpos($tagName, ':') === false) {
+                if(!str_contains($tagName, ':')) {
                     $tagName = 'd:' . $tagName;
                 } else {
                     [$prefix, $localName] = explode(':', $tagName, 2);
