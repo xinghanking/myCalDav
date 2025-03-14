@@ -6,18 +6,18 @@ use App\Models\Base\Controller;
 use App\Models\Base\Db;
 use App\Models\Db\Calendar;
 use App\Models\Db\Comp;
-use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class Put extends Controller
 {
     public function index(Request $request, $username)
     {
         if ($username != session('username')) {
-            return response(null,403);
+            return response('', Response::HTTP_FORBIDDEN);
         }
         if (empty($request->header('content-length'))) {
-            return response(null,400);
+            return response('',Response::HTTP_BAD_REQUEST);
         }
         $uri = $request->getRequestUri();
         if (empty($request->header('content-type')) || strtok($request->header('content-type'), ';') != 'text/calendar' || !in_array(substr($uri, -4), ['.ics', '.ifb'])) {
@@ -26,22 +26,22 @@ class Put extends Controller
         }
         $ics = Db::icsToArr(trim($request->getContent()));
         if (empty($ics)) {
-            return response(null,400);
+            return response('',Response::HTTP_BAD_REQUEST);
         }
         $dbCalendar = Calendar::getInstance();
         $upper = $dbCalendar->getBaseInfoByUri(dirname($uri) . '/');
         if (empty($upper)) {
-            return response(null,404);
+            return response('',Response::HTTP_NOT_FOUND);
         }
         $dbCalComp = Comp::getInstance();
         $info      = $dbCalComp->getBaseInfoByUri($uri);
         if ($info === false) {
-            return response(null,503);
+            return response('',Response::HTTP_SERVICE_UNAVAILABLE);
         }
         $tz  = $ics['VTIMEZONE'] ?? [];
         $ics = array_intersect_key($ics, Comp::TYPE_MAP);
         if (count($ics) > 1) {
-            return response(null,409);
+            return response('',Response::HTTP_CONFLICT);
         }
         $type          = Comp::TYPE_MAP[key($ics)];
         $ics           = current($ics);
@@ -49,27 +49,25 @@ class Put extends Controller
         $recurrenceIds = [];
         foreach ($ics as $item) {
             if ($compUid != '' && $compUid != $item['UID']) {
-                file_put_contents('/home/web/app/laravel/log', 3);
-                return response(null,400);
+                return response('',Response::HTTP_BAD_REQUEST);
             }
             $compUid = $item['UID'];
             $item['RECURRENCE-ID'] = $dbCalComp->formatCurrenceId($item['RECURRENCE-ID'] ?? '');
             if (in_array($item['RECURRENCE-ID'], $recurrenceIds)) {
-                file_put_contents('/home/web/app/laravel/log', 4);
-                return response(null,400);
+                return response('',Response::HTTP_BAD_REQUEST);
             }
             $recurrenceIds[] = $item['RECURRENCE-ID'];
         }
         if (empty($info)) {
             $obj = $dbCalComp->getRow('id', ['calendar_id' => $upper['id'], 'uid' => $compUid, 'recurrence_id' => '']);
             if (!empty($obj)) {
-                return response(null,409);
+                return response('',Response::HTTP_CONFLICT);
             }
             $dbCalendar->beginTransaction();
             $dbCalComp->addObject($uri, $upper['id'], $type, $ics);
             $dbCalendar->updateEtag($upper['id']);
             $dbCalendar->commit();
-            return response(null,201);
+            return response('',Response::HTTP_CREATED);
         } else {
             if ($type != $info['comp_type'] || $compUid != $info['uid']) {
                 return response(null,409);
@@ -106,7 +104,7 @@ class Put extends Controller
                 $dbCalendar->updateEtag($info['calendar_id']);
                 $dbCalComp->commit();
             }
-            return response(null,200);
+            return response('',Response::HTTP_OK);
         }
     }
 }
