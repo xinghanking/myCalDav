@@ -63,8 +63,9 @@ class Calendar extends Db
         }
         $prop['d:creationdate'] = gmdate('Y-m-d\TH:i:s\Z', time());
         $prop['d:getlastmodified'] = gmdate('D, d M Y H:i:s', time()) . ' GMT';
-        $prop['d:getetag'] = md5(uniqid(mt_rand(), true));
+        $prop['d:getetag'] = $this->createEtag();
         $prop['c:getctag'] = $prop['d:getetag'];
+        $prop['cs:getctag'] = $prop['d:getctag'];
         $prop['d:sync-token'] = 1;
         unset($prop['d:resourcetype']);
         $prop = array_merge($this->baseProp, $prop);
@@ -133,7 +134,8 @@ class Calendar extends Db
         $prop['d:getlastmodified'] = gmdate('Y-m-d\TH:i:s\Z', time());
         $prop['d:getetag'] = $this->createEtag();
         $prop['d:sync-token'] = $this->createSyncToken();
-        $prop['d:getctag'] = $prop['d:getetag'];
+        $prop['c:getctag'] = $prop['d:getetag'];
+        $prop['cs:getctag'] = $prop['d:getetag'];
         return static::query()->where('id', '=', $id)->update(['prop' => json_encode($prop, JSON_UNESCAPED_UNICODE)]);
     }
     public function updateEtag($id) {
