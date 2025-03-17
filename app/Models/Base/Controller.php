@@ -3,9 +3,6 @@
 namespace App\Models\Base;
 
 use App\Models\Db\PropNS;
-use DOMDocument;
-use DOMElement;
-use DOMNodeList;
 
 abstract class Controller
 {
@@ -35,40 +32,6 @@ abstract class Controller
             $replace['</'.$prefix.':'] = '</'.PropNS::getPrefixByUri($uri).':';
         }
         return str_replace(array_keys($replace), array_values($replace), $xml);
-    }
-
-    protected function xpath($path, DOMElement $objXml = null)
-    {
-        if (empty($objXml)) {
-            $objXml = new DOMDocument();
-            $objXml->loadXML($this->request->getContent());
-        }
-        $path = explode('/', $path, 2);
-        if (!str_contains($path[0], ':')) {
-            $obj = $objXml->getElementsByTagName($path[0]);
-        } else {
-            [$prefix, $name] = explode(':', $path[0], 2);
-            $obj
-                = $objXml->getElementsByTagNameNS(PropNS::getPrefixByUri($prefix),
-                $name);
-        }
-        if ($obj->length == 0) {
-            return null;
-        }
-        $res = [];
-        if (empty($path[1])) {
-            for ($i = 0; $i < $obj->length; $i++) {
-                $res[] = $obj->item($i);
-            }
-            return $res;
-        }
-        for ($i = 0; $i < $obj->length; $i++) {
-            $r = $this->xPath($path[1], $obj->item($i));
-            if (!empty($r)) {
-                $res = array_merge($res, $r);
-            }
-        }
-        return $res;
     }
 
     protected function xml_encode(array $data)
@@ -122,36 +85,5 @@ abstract class Controller
             $element .= ((isset($data[1]) && $data[1] !== '' && !is_array($data[1])) ? ('>' . strval($data[1]) . '</' . $qualifiedName . '>') : '/>');
         }
         return $element;
-    }
-
-    protected function xmlToArray(DOMNodeList $xml)
-    {
-        $nodeValue = [];
-        for ($i = 0; $i < $xml->length; $i++) {
-            if (!empty($xml->item($i)->tagName)) {
-                if (empty($xml->item($i)->childNodes)
-                    || ($xml->item($i)->childNodes->length == 1
-                        && empty($xml->item($i)->childNodes->item(0)->tagName))
-                ) {
-                    $v = trim($xml->item($i)->nodeValue);
-                } else {
-                    $v = $this->xmlToArray($xml->item($i)->childNodes);
-                    $v = empty($v) ? '' : $v;
-                }
-                $attrs = [];
-                $x     = $xml->item($i)->attributes;
-                if (!empty($x) && $x->length > 0) {
-                    for ($j = 0; $j < $x->length; $j++) {
-                        $attrs[$x->item($j)->nodeName]
-                            = $x->item($j)->nodeValue;
-                    }
-                }
-                $nodeValue[] = [
-                    $xml->item($i)->localName, $v, PropNs::getInstance()
-                        ->getNsIdByUri($xml->item($i)->namespaceURI), $attrs
-                ];
-            }
-        }
-        return $nodeValue;
     }
 }
