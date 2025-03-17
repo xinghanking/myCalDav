@@ -5,12 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Db\User;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
-
-use Symfony\Component\HttpKernel\Log\Logger;
-
-use function Laravel\Prompts\select;
 
 class Auth
 {
