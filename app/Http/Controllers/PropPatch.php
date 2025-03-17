@@ -15,21 +15,21 @@ class PropPatch extends Controller
     public function index(Request $request, string $username)
     {
         if($username != session('username')) {
-            return response(null,Response::HTTP_FORBIDDEN);
+            return response('',Response::HTTP_FORBIDDEN);
         }
         $uri = $request->getRequestUri();
         $this->request = $request;
         $prop = $this->getPatchProp();
         if (empty($prop['set']) && empty($prop['remove'])) {
-            return response(null, Response::HTTP_BAD_REQUEST);
+            return response('', Response::HTTP_BAD_REQUEST);
         }
         try{
             $dbCalendar = Calendar::getInstance();
-            if(in_array(substr($uri, -4), ['.ics'])) {
+            if(str_ends_with($uri, '.ics')) {
                 $dbComp = Comp::getInstance();
                 $info = $dbComp->getBaseInfoByUri($uri);
                 if (empty($info)) {
-                    return response(null,Response::HTTP_NOT_FOUND);
+                    return response('',Response::HTTP_NOT_FOUND);
                 }
                 $info['prop'] = json_decode($info['prop'], true);
                 if (!empty($prop['set'])) {
@@ -45,7 +45,7 @@ class PropPatch extends Controller
             } else {
                 $info = $dbCalendar->getBaseInfoByUri($uri);
                 if (empty($info)) {
-                    return response(null,Response::HTTP_NOT_FOUND);
+                    return response('',Response::HTTP_NOT_FOUND);
                 }
                 $info['prop'] = json_decode($info['prop'], true);
                 if (!empty($prop['set'])) {
