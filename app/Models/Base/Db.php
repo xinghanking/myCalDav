@@ -30,17 +30,33 @@ class Db extends Model
     private function __clone()
     {
     }
+
+    /**
+     * @return void
+     */
     public static function beginTransaction(){
         self::query()->getConnection()->beginTransaction();
     }
 
+    /**
+     * @return void
+     */
     public static function commit(){
         self::query()->getConnection()->commit();
     }
 
+    /**
+     * @return void
+     */
     public static function rollBack(){
         self::query()->getConnection()->rollBack();
     }
+
+    /**
+     * @param $columns
+     * @param $where
+     * @return array|null
+     */
     public function getRow($columns, $where) {
         $wh = [];
         foreach($where as $k => $v){
@@ -53,46 +69,92 @@ class Db extends Model
         return $res->toArray();
     }
 
+    /**
+     * @param $column
+     * @param $where
+     * @return Model
+     */
+
     public function getColumn($column, $where = [])
     {
         $wh = [];
         foreach($where as $k => $v){
             $wh[] = [$k, '=', $v];
         }
-        return static::query()->select($column)->where($wh)->get()->value($column);
+        $row = static::query()->select($column)->where($wh)->get()->value($column)->toArray();
+        return $row[$column] ?? null;
     }
 
+    /**
+     * @param $where
+     * @return int
+     */
     public function getCount($where = [])
     {
         return static::query()->where($where)->count();
     }
+
+    /**
+     * @param $columns
+     * @param $where
+     * @param $orderBy
+     * @param $page
+     * @param $limit
+     * @return array
+     */
     public function getData($columns, $where = [], $orderBy = null, $page = 1, $limit = 500){
         return static::query()->select($columns)->where($where)->orderBy($orderBy ?? 'id')->forPage($page, $limit)->get()->toArray();
     }
 
+    /**
+     * @param array $values
+     * @return int
+     */
     public function insertGetId(array $values)
     {
         return static::query()->insertGetId($values);
     }
 
+    /**
+     * @param array $values
+     * @param array $where
+     * @return string|null
+     */
     public function insertOrUpdate(array $values, array $where) {
         return static::query()->updateOrCreate($where, $values)->newUniqueId();
     }
 
+    /**
+     * @param $where
+     * @return mixed
+     */
     public function del($where = [])
     {
         return $this->query()->where($where)->forceDelete();
     }
 
+    /**
+     * @param array $values
+     * @return bool
+     */
     public function batchInsert(array $values){
         return static::query()->insert($values);
     }
 
+    /**
+     * @param array $values
+     * @param array $where
+     * @return int
+     */
     public function updateSet(array $values, array $where = [])
     {
         return static::query()->where($where)->update($values);
     }
 
+    /**
+     * @param string $ics
+     * @return array
+     */
     public static function icsToArr(string $ics)
     {
         $info            = [];
@@ -173,6 +235,10 @@ class Db extends Model
         return $info;
     }
 
+    /**
+     * @param array $arr
+     * @return string
+     */
     public static function arrToIcs(array $arr) {
         $comp = [];
         if (isset($arr['RECURRENCE-ID']) && $arr['RECURRENCE-ID'] == '') {
