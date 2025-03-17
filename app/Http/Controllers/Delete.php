@@ -12,7 +12,7 @@ use Illuminate\Http\Response;
 
 class Delete extends Controller
 {
-    public function index(Request $request, $username)
+    public function index(Request $request, string $username)
     {
         if($username != session('username')) {
             response(null,Response::HTTP_FORBIDDEN);
