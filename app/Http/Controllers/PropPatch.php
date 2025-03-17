@@ -12,7 +12,7 @@ use Illuminate\Http\Response;
 
 class PropPatch extends Controller
 {
-    public function index(Request $request, $username)
+    public function index(Request $request, string $username)
     {
         if($username != session('username')) {
             return response(null,Response::HTTP_FORBIDDEN);

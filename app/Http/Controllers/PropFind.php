@@ -124,7 +124,7 @@ class PropFind extends Controller
             $response = $this->getCalendarProp($info, $reqType, $depth, $findProp);
         }
         $response = $this->xml_encode(['multistatus', $response]);
-        return response($response, Response::HTTP_MULTI_STATUS, ['Content-Type' => 'application/xml']);
+        return response($response, Response::HTTP_MULTI_STATUS, ['Content-Type' => 'application/xml', 'DAV'  => '1, 3, calendarserver-principal-property-search, calendar-access, calendar-auto-schedule, calendar-availability, sync-collection, calendar-multiget']);
     }
 
     protected function getCalendarProp($info, $type, $depth, $findProp)

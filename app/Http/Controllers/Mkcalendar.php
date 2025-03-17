@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
 
 class Mkcalendar extends Controller
 {
-    public function index(Request $request, String $username){
+    public function index(Request $request, string $username){
         if($username != session('username')) {
             return response('', Response::HTTP_FORBIDDEN);
         }
