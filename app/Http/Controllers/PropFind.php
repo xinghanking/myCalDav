@@ -31,11 +31,11 @@ class PropFind extends Controller
         } elseif(preg_match('/<prop>(.*)<\/prop>/is', $xml, $xmlMatches)) {
             $reqType = 'prop';
             if (empty($xmlMatches[1])) {
-                return response(null, Response::HTTP_BAD_REQUEST);
+                return response('', Response::HTTP_BAD_REQUEST);
             }
-            preg_match_all('/<([^\/]+)\s*\/>/', $xmlMatches[1], $matches);
+            preg_match_all('/<(.+?)\s*\/>/s', $xmlMatches[1], $matches);
             if (empty($matches[1])) {
-                return response(null, Response::HTTP_BAD_REQUEST);
+                return response('', Response::HTTP_BAD_REQUEST);
             }
             foreach ($matches[1] as $tagName) {
                 $tagName = trim($tagName);
@@ -65,7 +65,6 @@ class PropFind extends Controller
             $baseProp['d:resourcetype'] = ['resourcetype', [['principal']]];
         }
         if (rtrim($uri, '/') == '/' . session('username') . '/calendars') {
-            $baseProp['d:resourcetype'] = ['resourcetype', [['collection'], ['calendar', '', PropNs::CAL_ID]]];
             $baseProp['d:supported-report-set'] = ['supported-report-set', '<d:report><d:sync-collection /></d:report><d:report><c:calendar-multiget /></d:report><d:report><c:calendar-query /></d:report><d:report><c:free-busy-query /></d:report>'];
             $baseProp['d:sync-token'] = ['sync-token', ''];
         }
